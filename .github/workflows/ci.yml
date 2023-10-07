@@ -51,4 +51,6 @@ jobs:
           with:
               nuget-version: '6.x'
               nuget-api-key: ${{secrets.NUGET_API_KEY}}
+        
+        - run: nuget push dist/*.nupkg -Source https://api.nuget.org/v3/index.json
 

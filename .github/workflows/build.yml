@@ -10,11 +10,19 @@ jobs:
         working-directory: src
     steps:
       - uses: actions/checkout@v3
-      - name: setup-node
+      
+      - name: install node
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+
+      - name: install yarn
+        run: corepack enable | corepack prepare yarn@3.6.4 --activate
+
+      - name: workaround https://github.com/actions/setup-node/issues/531
+        uses: actions/setup-node@v3
+        with:
           cache: yarn
           cache-dependency-path: src/yarn.lock
-      - run: corepack enable
+
       - run: yarn install --immutable

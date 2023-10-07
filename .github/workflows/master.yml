@@ -1,9 +1,9 @@
-name: build
-on: [push]
+name: master
+on: 
+  push: { branches: [master] }
 
 jobs:
   build:
-    name: build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,3 +26,9 @@ jobs:
           cache-dependency-path: src/yarn.lock
 
       - run: yarn install --immutable
+
+      - uses: nuget/setup-nuget@v1
+        with:
+            nuget-version: '6.x'
+
+      - run: nuget pack -Version 0.19.4.${{github.run_number}} -OutputDirectory ../dist

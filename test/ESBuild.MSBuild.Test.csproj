@@ -16,7 +16,11 @@
     <PackageReference Include="ESBuild.MSBuild" Version="0.19.4" />
   </ItemGroup>
 
-  <Target Name="Integration" BeforeTargets="CoreCompile">
+  <ItemGroup>
+    <EntryPoint Include="index.js" />
+  </ItemGroup>
+
+  <Target Name="LowLevelIntegration" BeforeTargets="CoreCompile">
     <Exec Command="$(ESBuildPath) index.js --outfile=bin/Debug/net7.0/bundle.js --log-level=warning" />
   </Target>
 </Project>

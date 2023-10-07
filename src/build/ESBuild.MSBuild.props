@@ -8,5 +8,6 @@
         <_ESBuildBinary>esbuild</_ESBuildBinary>
         <_ESBuildBinary Condition="'$(OS)' == 'Windows_NT'">esbuild.exe</_ESBuildBinary>
         <ESBuildPath>$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildPath>
+        <ESBuildArguments>--log-level=warning --minify</ESBuildArguments>
     </PropertyGroup>
 </Project>

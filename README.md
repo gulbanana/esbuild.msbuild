@@ -7,7 +7,13 @@
 
 Usage
 -----
-Add `<PackageReference Include="ESBuild.MSBuild" />` to your .csproj file. This will set the property `ESBuildPath`, which can be used by the Exec task to run a platform-appropriate copy of esbuild.
+Add `<PackageReference Include="ESBuild.MSBuild" />` to your .csproj file. This will set the property `ESBuildPath`, which can be used directly for low-level integrations (for exmaple, by the Exec task). For high-level use, add `<EntryPoint>` items to your project, as in
+```
+<ItemGroup>
+    <EntryPoint Include="index.js" />
+</ItemGroup>
+```
+Each entry point will be copied to the output as a Bundle item.
 
 Platforms
 ---------

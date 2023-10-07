@@ -1,0 +1,22 @@
+<Project>
+    <Target Name="_ESBuildOutputs">
+        <ItemGroup>
+            <Bundle Include="$(OutputPath)%(EntryPoint.Filename)%(EntryPoint.Extension)" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="ESBuild" 
+            DependsOnTargets="_ESBuildOutputs" AfterTargets="CopyFilesToOutputDirectory" BeforeTargets="BuiltProjectOutputGroup;RegisterOutput" 
+            Inputs="@(EntryPoint)" Outputs="@(Bundle)">        
+        <Exec Command='"$(ESBuildPath)" %(EntryPoint.Identity) --outfile=$(OutputPath)%(EntryPoint.Filename)%(EntryPoint.Extension) --bundle $(ESBuildArguments)'>
+            <Output TaskParameter="ExitCode" PropertyName="_ESBuildExitCode" />
+        </Exec>
+
+        <Message Condition="$(_ESBuildExitCode) == 0" Importance="high"
+                 Text="%(EntryPoint.Filename)%(EntryPoint.Extension) -> $([System.IO.Path]::GetFullPath('$(OutputPath)%(EntryPoint.Filename)%(EntryPoint.Extension)'))" />
+
+        <ItemGroup Condition="$(_ESBuildExitCode) == 0">
+            <BuiltProjectOutputGroupOutput Include="@(Bundle)" />
+        </ItemGroup>
+    </Target>
+</Project>

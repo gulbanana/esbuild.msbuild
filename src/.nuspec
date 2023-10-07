@@ -13,11 +13,11 @@
     </metadata>
   <files>
     <file src="..\README.md" target="docs\" />
-    <file src="node_modules\@esbuild\win32-x64\esbuild.exe" target="runtimes\win-x64\tools\" />
-    <file src="node_modules\@esbuild\win32-arm64\esbuild.exe" target="runtimes\win-arm64\tools\" />
-    <file src="node_modules\@esbuild\linux-x64\bin\esbuild" target="runtimes\linux-x64\tools\" />
-    <file src="node_modules\@esbuild\linux-arm64\bin\esbuild" target="runtimes\linux-arm64\tools\" />
-    <file src="node_modules\@esbuild\darwin-x64\bin\esbuild" target="runtimes\osx-x64\tools\" />
-    <file src="node_modules\@esbuild\darwin-arm64\bin\esbuild" target="runtimes\osx-arm64\tools\" />
+    <file src="node_modules\@esbuild\win32-x64\esbuild.exe" target="tools\win-x64\" />
+    <file src="node_modules\@esbuild\win32-arm64\esbuild.exe" target="tools\win-arm64\" />
+    <file src="node_modules\@esbuild\linux-x64\bin\esbuild" target="tools\linux-x64\" />
+    <file src="node_modules\@esbuild\linux-arm64\bin\esbuild" target="tools\linux-arm64\" />
+    <file src="node_modules\@esbuild\darwin-x64\bin\esbuild" target="tools\osx-x64\" />
+    <file src="node_modules\@esbuild\darwin-arm64\bin\esbuild" target="tools\osx-arm64\" />
   </files>
 </package>

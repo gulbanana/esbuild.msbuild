@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata>
-        <id>ESBuild.MSBuild</id>
-        <version>0.19.4</version>
-        <description>esbuild for MSBuild</description>
-        <authors>Thomas Castiglione</authors>
-        <copyright>Thomas Castiglione</copyright>
-        <license type="expression">MIT</license>
-        <projectUrl>https://github.com/gulbanana/ESBuild.MSBuild</projectUrl>        
-        <repository type="git" url="https://github.com/gulbanana/ESBuild.MSBuild.git" branch="master" />
-        <readme>docs\README.md</readme>
-    </metadata>
+  <metadata>
+    <id>ESBuild.MSBuild</id>
+    <version>0.19.4</version>
+    <description>esbuild for MSBuild</description>
+    <authors>Thomas Castiglione</authors>
+    <copyright>Thomas Castiglione</copyright>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/gulbanana/ESBuild.MSBuild</projectUrl>
+    <repository type="git" url="https://github.com/gulbanana/ESBuild.MSBuild.git" branch="master" />
+    <readme>docs\README.md</readme>
+  </metadata>
+
   <files>
     <file src="..\README.md" target="docs\" />
+
     <file src="node_modules\@esbuild\win32-x64\esbuild.exe" target="tools\win-x64\" />
     <file src="node_modules\@esbuild\win32-arm64\esbuild.exe" target="tools\win-arm64\" />
     <file src="node_modules\@esbuild\linux-x64\bin\*" target="tools\linux-x64\" />
     <file src="node_modules\@esbuild\linux-arm64\bin\*" target="tools\linux-arm64\" />
     <file src="node_modules\@esbuild\darwin-x64\bin\*" target="tools\osx-x64\" />
     <file src="node_modules\@esbuild\darwin-arm64\bin\*" target="tools\osx-arm64\" />
+
+    <file src="build\*" target="build\" />
   </files>
 </package>

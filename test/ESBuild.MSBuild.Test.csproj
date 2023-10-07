@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageReference Include="ESBuild.MSBuild" Version="0.19.4" />
+  </ItemGroup>
+
+  <Target Name="Integration" BeforeTargets="CoreCompile">
+    <Exec Command="$(ESBuildPath) index.js --outfile=bin/Debug/net7.0/bundle.js --log-level=warning" />
+  </Target>
+</Project>

@@ -5,6 +5,10 @@
 
 `ESBuild.MSBuild` is a NuGet package which wraps [esbuild](https://esbuild.github.io/), enabling frontend builds without Node or NPM.
 
+Usage
+-----
+Add `<PackageReference Include="ESBuild.MSBuild" />` to your .csproj file. This will set the property `ESBuildPath`, which can be used by the Exec task to run a platform-appropriate copy of esbuild.
+
 Platforms
 ---------
 The package contains esbuild binaries for MacOS, Windows and Linux (glibc), on AMD64 and ARM64.

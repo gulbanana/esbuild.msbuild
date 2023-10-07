@@ -1,0 +1,12 @@
+<Project>
+    <PropertyGroup>
+        <_ESBuildOS Condition="$([MSBuild]::IsOsPlatform('Windows'))">win</_ESBuildOS>
+        <_ESBuildOS Condition="$([MSBuild]::IsOsPlatform('Linux'))">linux</_ESBuildOS>
+        <_ESBuildOS Condition="$([MSBuild]::IsOsPlatform('OSX'))">osx</_ESBuildOS>
+        <_ESBuildArch Condition="$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) == X64">x64</_ESBuildArch>
+        <_ESBuildArch Condition="$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) == Arm64">arm64</_ESBuildArch>
+        <_ESBuildBinary>esbuild</_ESBuildBinary>
+        <_ESBuildBinary Condition="'$(OS)' == 'Windows_NT'">esbuild.exe</_ESBuildBinary>
+        <ESBuildPath>$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildPath>
+    </PropertyGroup>
+</Project>

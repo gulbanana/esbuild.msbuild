@@ -1,6 +1,9 @@
 name: release
 on: 
-  push: { branches: [release] }
+  workflow_run: 
+    branches: [release]
+    workflows: [master]
+    types: [completed]
 
 jobs:
   deploy:
@@ -10,3 +13,9 @@ jobs:
           with:
             name: package
             path: dist
+
+        - uses: nuget/setup-nuget@v1
+          with:
+              nuget-version: '6.x'
+              nuget-api-key: ${{secrets.NUGET_API_KEY}}
+

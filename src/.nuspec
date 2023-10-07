@@ -15,9 +15,9 @@
     <file src="..\README.md" target="docs\" />
     <file src="node_modules\@esbuild\win32-x64\esbuild.exe" target="tools\win-x64\" />
     <file src="node_modules\@esbuild\win32-arm64\esbuild.exe" target="tools\win-arm64\" />
-    <file src="node_modules\@esbuild\linux-x64\bin\esbuild" target="tools\linux-x64\" />
-    <file src="node_modules\@esbuild\linux-arm64\bin\esbuild" target="tools\linux-arm64\" />
-    <file src="node_modules\@esbuild\darwin-x64\bin\esbuild" target="tools\osx-x64\" />
-    <file src="node_modules\@esbuild\darwin-arm64\bin\esbuild" target="tools\osx-arm64\" />
+    <file src="node_modules\@esbuild\linux-x64\bin\*" target="tools\linux-x64\" />
+    <file src="node_modules\@esbuild\linux-arm64\bin\*" target="tools\linux-arm64\" />
+    <file src="node_modules\@esbuild\darwin-x64\bin\*" target="tools\osx-x64\" />
+    <file src="node_modules\@esbuild\darwin-arm64\bin\*" target="tools\osx-arm64\" />
   </files>
 </package>

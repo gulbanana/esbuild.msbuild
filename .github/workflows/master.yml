@@ -1,6 +1,5 @@
 name: master
-on: 
-  push: { branches: [master] }
+on: [push]
 
 jobs:
   build:
@@ -32,3 +31,8 @@ jobs:
             nuget-version: '6.x'
 
       - run: nuget pack -Version 0.19.4.${{github.run_number}} -OutputDirectory ../dist
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: package
+          path: dist/*.nupkg

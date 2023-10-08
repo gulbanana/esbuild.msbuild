@@ -1,26 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <PackageReference Include="ESBuild.MSBuild" Version="0.19.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EntryPoint Include="index.js" />
-  </ItemGroup>
-
-  <Target Name="LowLevelIntegration" BeforeTargets="CoreCompile">
-    <Exec Command="$(ESBuildPath) index.js --outfile=bin/Debug/net7.0/bundle.js --log-level=warning" />
-  </Target>
+	<ItemGroup>
+		<PackageReference Include="ESBuild.MSBuild" Version="0.19.4" />
+		<ESBuild Include="index.js" />
+	</ItemGroup>
 </Project>

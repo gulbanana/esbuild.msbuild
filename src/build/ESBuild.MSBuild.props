@@ -7,7 +7,9 @@
         <_ESBuildArch Condition="$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) == Arm64">arm64</_ESBuildArch>
         <_ESBuildBinary>esbuild</_ESBuildBinary>
         <_ESBuildBinary Condition="'$(OS)' == 'Windows_NT'">esbuild.exe</_ESBuildBinary>
-        <ESBuildPath>$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildPath>
-        <ESBuildArguments>--log-level=warning --minify</ESBuildArguments>
+        <ESBuildBinaryPath>$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildBinaryPath>
+        <ESBuildIntermediatePath></ESBuildIntermediatePath>
+        <ESBuildWebRoot>wwwroot\</ESBuildWebRoot>
+        <ESBuildArguments>--bundle --minify</ESBuildArguments>
     </PropertyGroup>
 </Project>

@@ -7,14 +7,34 @@
 
 Usage
 -----
-Add `<PackageReference Include="ESBuild.MSBuild" />` to your .csproj file. This will set the property `ESBuildPath`, which can be used directly for low-level integrations (for exmaple, by the Exec task). For high-level use, add `<EntryPoint>` items to your project, as in
+Add a package reference and `ESBuild` items to your csproj. Each entry point will be bundled and converted into a `Content` item, which will be published and (if you are using ASP.NET Core) included as a static web asset, accessible at `_content/<Your.Project.Name>/<bundle.name>`. Example:
 ```
-<ItemGroup>
-    <EntryPoint Include="index.js" />
-</ItemGroup>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ESBuild.MSBuild" Version="0.19.4.11" />
+		<ESBuild Include="index.ts" />
+	</ItemGroup>
+</Project>
 ```
-Each entry point will be copied to the output as a Bundle item.
+
+API
+---
+For more complex scenarios, these MSBuild properties are available.
+| Property                  | Description                              | Default                         | Purpose                                                                                           |
+| ------------------------- | ---------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `ESBuildBinaryPath`       | Location of `esbuild` or `esbuild.exe`.  | Platform-specific.              | For low-level integration - use it to run esbuild yourself, or change it to run a custom version. |                                        |
+| `ESBuildIntermediatePath` | Location to write generated bundles.     | `obj/$(Configuration)/esbuild/` | Can be changed if you want to store the bundles or distribute them out-of-band.                   |
+| `ESBuildWebRoot`          | Virtual path of generated Content items. | `wwwroot/`                      | Provides static web assets integration and the output path used for `dotnet publish`.             |
+| `ESBuildArguments`        | Parameters passed to esbuild.            | `--bundle --minify`             | See [https://esbuild.github.io/api/](https://esbuild.github.io/api/) for available options.       |
 
 Platforms
 ---------
 The package contains esbuild binaries for MacOS, Windows and Linux (glibc), on AMD64 and ARM64.
+
+Versions
+--------
+The first three digits of the package version are the version of the included esbuild, and the fourth digit is the package build number.

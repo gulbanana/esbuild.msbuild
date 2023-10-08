@@ -21,6 +21,7 @@ jobs:
       - name: workaround https://github.com/actions/setup-node/issues/531
         uses: actions/setup-node@v3
         with:
+          node-version: 18.x
           cache: yarn
           cache-dependency-path: src/yarn.lock
 

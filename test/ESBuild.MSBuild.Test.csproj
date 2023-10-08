@@ -7,6 +7,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="ESBuild.MSBuild" Version="0.19.4" />
-		<ESBuild Include="index.js" />
+		<ESBuild Include="index.js" Targets="esnext;es2020" />
 	</ItemGroup>
 </Project>

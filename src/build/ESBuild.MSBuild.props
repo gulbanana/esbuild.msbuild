@@ -9,7 +9,11 @@
         <_ESBuildBinary Condition="'$(OS)' == 'Windows_NT'">esbuild.exe</_ESBuildBinary>
         <ESBuildBinaryPath>$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildBinaryPath>
         <ESBuildIntermediatePath></ESBuildIntermediatePath>
-        <ESBuildWebRoot>wwwroot\</ESBuildWebRoot>
-        <ESBuildArguments>--bundle --minify</ESBuildArguments>
+        <ESBuildWebRoot>wwwroot\</ESBuildWebRoot>        
+        <ESBuildBundle>True</ESBuildBundle>
+        <ESBuildMinify>False</ESBuildMinify>
+        <ESBuildMinify Condition="'$(Configuration)' == 'Release'">True</ESBuildMinify>
+        <ESBuildTargets>esnext</ESBuildTargets>
+        <ESBuildArguments></ESBuildArguments>
     </PropertyGroup>
 </Project>

@@ -2,17 +2,34 @@
     <Target Name="_ESBuildPrepareForRun">
         <PropertyGroup>
             <_ESBuildBundlePath>$(IntermediateOutputPath)esbuild\</_ESBuildBundlePath>
-            <_ESBuildBundlePath Condition="'$(ESBuildIntermediatePath)' != ''">
-                $(ESBuildIntermediatePath)</_ESBuildBundlePath>
+            <_ESBuildBundlePath Condition="'$(ESBuildIntermediatePath)' != ''">$(ESBuildIntermediatePath)</_ESBuildBundlePath>
         </PropertyGroup>
     </Target>
 
     <Target Name="_ESBuildTransform" DependsOnTargets="_ESBuildPrepareForRun" Inputs="@(ESBuild)" Outputs="@(ESBuild -> '$(_ESBuildBundlePath)%(Filename)%(Extension)')">
         <ItemGroup>
-            <_ESBundle Include="$(_ESBuildBundlePath)%(ESBuild.Filename)%(ESBuild.Extension)" Src="%(ESBuild.Identity)" />
+            <_ESBundle Include="$(_ESBuildBundlePath)%(ESBuild.Filename)%(ESBuild.Extension)">
+                <Src>%(ESBuild.Identity)</Src>
+
+                <Bundle Condition="'%(ESBuild.Bundle)' == 'True'"> --bundle</Bundle>
+                <Bundle Condition="'%(ESBuild.Bundle)' == '' and '$(ESBuildBundle)' == 'True'"> --bundle</Bundle>
+                
+                <Minify Condition="'%(ESBuild.Minify)' == 'True'"> --minify</Minify>
+                <Minify Condition="'%(ESBuild.Minify)' == '' and '$(ESBuildMinify)' == 'True'"> --minify</Minify>
+
+                <Targets Condition="'%(ESBuild.Targets)' != ''"> --target=$([System.String]::new("%(ESBuild.Targets)").Replace(";",","))</Targets>
+                <Targets Condition="'%(ESBuild.Targets)' == '' and '$(ESBuildTargets)' != ''"> --target=$([System.String]::new("$(ESBuildTargets)").Replace(";",","))</Targets>
+
+                <Arguments>$(ESBuildArguments)</Arguments>
+                <Arguments Condition="'%(ESBuild.Arguments)' != ''">%(ESBuild.Arguments)</Arguments>
+            </_ESBundle>
         </ItemGroup>
 
-        <Exec Command='"$(ESBuildBinaryPath)" %(_ESBundle.Src) --outfile=%(_ESBundle.Identity) --log-level=warning $(ESBuildArguments)'>
+        <Exec Condition="'%(_ESBundle.Arguments)' != ''" Command='"$(ESBuildBinaryPath)" %(_ESBundle.Src) --outfile=%(_ESBundle.Identity) --log-level=warning %(_ESBundle.Arguments)'>
+            <Output TaskParameter="ExitCode" PropertyName="_ESBuildExitCode" />
+        </Exec>
+
+        <Exec Condition="'%(_ESBundle.Arguments)' == ''" Command='"$(ESBuildBinaryPath)" %(_ESBundle.Src) --outfile=%(_ESBundle.Identity) --log-level=warning%(_ESBundle.Bundle)%(_ESBundle.Minify)%(_ESBundle.Targets)'>
             <Output TaskParameter="ExitCode" PropertyName="_ESBuildExitCode" />
         </Exec>
 

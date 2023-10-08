@@ -24,6 +24,7 @@
         <ItemGroup Condition="'$(_ESBuildExitCode)' == '0' or '$(_ESBuildExitCode)' == ''">
             <Content Include="@(_ESBundle)" Link="$(ESBuildWebRoot)%(_ESBundle.Src)" />
             <FileWrites Include="@(_ESBundle)" />
+            <UpToDateCheckBuilt Include="@(_ESBundle)" Original="%(_ESBundle.Src)" />
         </ItemGroup>
     </Target>
 

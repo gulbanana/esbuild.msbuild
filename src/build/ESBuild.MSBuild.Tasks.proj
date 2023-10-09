@@ -1,0 +1,54 @@
+<Project>
+  <!-- Calculates the entrypoint for each set of ESBuild items with the same Group -->
+  <UsingTask TaskName="_ESConcatPrep" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Sources ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <BundlePath ParameterType="System.String" Required="true" />
+      <Destinations ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+      <![CDATA[
+        var destinations = new List<ITaskItem>();
+
+        foreach (var sourceGroup in Sources.GroupBy(s => s.GetMetadata("Group")))
+        {
+          var representativeItem = sourceGroup.First();
+          var destinationItem = new TaskItem(Path.Combine(BundlePath, sourceGroup.Key));
+          representativeItem.CopyMetadataTo(destinationItem);
+          destinationItem.RemoveMetadata("Group");
+          destinationItem.SetMetadata("Spec", string.Join(";", sourceGroup.Select(s => s.ItemSpec)));
+          destinations.Add(destinationItem);
+        }
+        
+        Destinations = destinations.ToArray();
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <!-- Concatenates a single set of items with the same Group - batched by target rather than task -->
+  <UsingTask TaskName="_ESConcat" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Sources ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <BundlePath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+      <![CDATA[
+        Directory.CreateDirectory(BundlePath);
+
+        var representativeItem = Sources.First();
+        var destination = Path.Combine(BundlePath, representativeItem.GetMetadata("Group"));
+
+        var concatenated = new StringBuilder();
+        foreach (var source in Sources)
+        {
+          concatenated.AppendLine(File.ReadAllText(source.ItemSpec));
+        }        
+        File.WriteAllText(destination, concatenated.ToString());
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+</Project>

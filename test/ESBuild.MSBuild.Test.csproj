@@ -8,5 +8,7 @@
 	<ItemGroup>
 		<PackageReference Include="ESBuild.MSBuild" Version="0.19.4" />
 		<ESBuild Include="index.js" Targets="esnext;es2020" />
+		<ESBuild Include="groups\style1.css;groups\style2.css" Group="group12.css" />
+		<ESBuild Include="groups\subdir\*.css" Group="group34.css" Minify="true" />
 	</ItemGroup>
 </Project>

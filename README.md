@@ -16,8 +16,9 @@ Add a package reference and `ESBuild` items to your csproj. Each entry point wil
     
     <ItemGroup>
         <PackageReference Include="ESBuild.MSBuild" Version="0.19.4.21" />
-        <ESBuild Include="index.ts" />
-        <ESBuild Include="app.css" Minify="True" />
+        <ESBuild Include="index.ts" Minify="true" />
+        <ESBuild Include="app.css" />
+        <ESBuild Include="global/*.css" Group="global.css" />
     </ItemGroup>
 </Project>
 ```
@@ -40,7 +41,7 @@ Bundling can be configured with properties or item metadata
 | `ESBuildBundle`    | `Bundle`      | `True`                           | Inline any imported dependencies into the output file.                                               |
 | `ESBuildMinify`    | `Minify`      | `True` in Release configuration. | Rewrite syntax to be more compact. Takes advantage of all features allowed by Targets.               |
 | `ESBuildTargets`   | `Targets`     | `esnext`                         | Semicolon-separated list of required support levels. (Unlike `--targets`, which is comma-separated). |
-
+| n/a                | `Group`       | None.                            | ESBuild items with the same Group will be concatenated together before bundling.                     |
 
 Platforms
 ---------

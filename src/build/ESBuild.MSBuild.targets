@@ -1,15 +1,47 @@
 <Project>
-    <Target Name="_ESBuildPrepareForRun">
+    <Import Project="$(MSBuildThisFileDirectory)ESBuild.MSBuild.Tasks.proj" />
+
+    <!-- Use the specified dist path or a default -->
+    <Target Name="_ESBuildDefineProps">
         <PropertyGroup>
-            <_ESBuildBundlePath>$(IntermediateOutputPath)esbuild\</_ESBuildBundlePath>
-            <_ESBuildBundlePath Condition="'$(ESBuildIntermediatePath)' != ''">$(ESBuildIntermediatePath)</_ESBuildBundlePath>
+            <_ESBundlePath>$(IntermediateOutputPath)esbundle\</_ESBundlePath>
+            <_ESOutputPath>$(IntermediateOutputPath)esbuild\</_ESOutputPath>
+            <_ESOutputPath Condition="'$(ESBuildIntermediatePath)' != ''">$(ESBuildIntermediatePath)</_ESOutputPath>
         </PropertyGroup>
     </Target>
 
-    <Target Name="_ESBuildTransform" DependsOnTargets="_ESBuildPrepareForRun" Inputs="@(ESBuild)" Outputs="@(ESBuild -> '$(_ESBuildBundlePath)%(Filename)%(Extension)')">
+    <!-- Extract items with Group set, which represent a single entry point per glob -->
+    <Target Name="_ESBuildExtractGroups">
         <ItemGroup>
-            <_ESBundle Include="$(_ESBuildBundlePath)%(ESBuild.Filename)%(ESBuild.Extension)">
+            <_ESBundle Include="@(ESBuild)" Condition="%(ESBuild.Group) != ''" />
+            <ESBuild Remove="@(ESBuild)" Condition="'%(ESBuild.Group)' != ''" />
+        </ItemGroup>
+    </Target>
+
+    <!-- Define entrypoints from each group of items - batches internally inside the task so that we always get output items -->
+    <Target Name="_ESBuildPartitionGroups" DependsOnTargets="_ESBuildDefineProps;_ESBuildExtractGroups">
+        <_ESConcatPrep Sources="@(_ESBundle)" BundlePath="$(_ESBundlePath)">
+            <Output TaskParameter="Destinations" ItemName="_ESBundleEntryPoint" />
+        </_ESConcatPrep>
+
+        <ItemGroup>
+            <ESBuild Include="@(_ESBundleEntryPoint)" />
+        </ItemGroup>
+    </Target>
+    
+    <!-- Perform the actual concatenation if inputs have changed -->
+    <Target Name="_ESBuildConcatGroups" DependsOnTargets="_ESBuildDefineProps;_ESBuildExtractGroups" Inputs="@(_ESBundle)" Outputs="$(_ESBundlePath)%(Group)">
+        <_ESConcat Sources="@(_ESBundle)" BundlePath="$(_ESBundlePath)" />
+    </Target>
+
+    <!-- Resolve each entry point's config, run esbuild and notify about it -->
+    <Target Name="_ESBuildTransform" DependsOnTargets="_ESBuildPartitionGroups;_ESBuildConcatGroups" Inputs="@(ESBuild)" Outputs="@(ESBuild -> '$(_ESOutputPath)%(Filename)%(Extension)')">
+        <ItemGroup>
+            <_ESEntryPoint Include="$(_ESOutputPath)%(ESBuild.Filename)%(ESBuild.Extension)">
                 <Src>%(ESBuild.Identity)</Src>
+
+                <Spec>%(ESBuild.Identity)</Spec>
+                <Spec Condition="'%(ESBuild.Spec)' != ''">%(ESBuild.Spec)</Spec>
 
                 <Bundle Condition="'%(ESBuild.Bundle)' == 'True'"> --bundle</Bundle>
                 <Bundle Condition="'%(ESBuild.Bundle)' == '' and '$(ESBuildBundle)' == 'True'"> --bundle</Bundle>
@@ -22,33 +54,41 @@
 
                 <Arguments>$(ESBuildArguments)</Arguments>
                 <Arguments Condition="'%(ESBuild.Arguments)' != ''">%(ESBuild.Arguments)</Arguments>
-            </_ESBundle>
+            </_ESEntryPoint>
         </ItemGroup>
 
-        <Exec Condition="'%(_ESBundle.Arguments)' != ''" Command='"$(ESBuildBinaryPath)" %(_ESBundle.Src) --outfile=%(_ESBundle.Identity) --log-level=warning %(_ESBundle.Arguments)'>
-            <Output TaskParameter="ExitCode" PropertyName="_ESBuildExitCode" />
+        <Exec Condition="'%(_ESEntryPoint.Arguments)' != ''" Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning %(_ESEntryPoint.Arguments)'>
+            <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />
         </Exec>
 
-        <Exec Condition="'%(_ESBundle.Arguments)' == ''" Command='"$(ESBuildBinaryPath)" %(_ESBundle.Src) --outfile=%(_ESBundle.Identity) --log-level=warning%(_ESBundle.Bundle)%(_ESBundle.Minify)%(_ESBundle.Targets)'>
-            <Output TaskParameter="ExitCode" PropertyName="_ESBuildExitCode" />
+        <Exec Condition="'%(_ESEntryPoint.Arguments)' == ''" Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)'>
+            <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />
         </Exec>
 
-        <Message Condition="$(_ESBuildExitCode) == 0" Importance="high"
-                 Text="%(_ESBundle.Src) -> $([System.IO.Path]::GetFullPath('%(_ESBundle.Identity)'))" />
+        <Message Condition="$(_ESExitCode) == 0" Importance="high"
+                 Text="%(_ESEntryPoint.Spec) -> $([System.IO.Path]::GetFullPath('%(_ESEntryPoint.Identity)'))" />
     </Target>
 
+    <!-- Even if the transform target was skipped, it defined entrypoint items; mark those as content -->
     <Target Name="_ESBuildOutputs" DependsOnTargets="_ESBuildTransform" BeforeTargets="AssignTargetPaths;ResolveProjectStaticWebAssets">
-        <ItemGroup Condition="'$(_ESBuildExitCode)' == '0' or '$(_ESBuildExitCode)' == ''">
-            <Content Include="@(_ESBundle)" Link="$(ESBuildWebRoot)%(_ESBundle.Src)" />
-            <FileWrites Include="@(_ESBundle)" />
-            <UpToDateCheckBuilt Include="@(_ESBundle)" Original="%(_ESBundle.Src)" />
+        <ItemGroup>
+            <FileWrites Include="@(_ESBundleEntryPoint)" />
+            <UpToDateCheckInput Include="@(_ESBundle)" Set="%(_ESBundle.Group)" />
+            <UpToDateCheckOutput Include="@(_ESBundleEntryPoint)" Set="%(_ESBundleEntryPoint.Filename)%(_ESBundleEntryPoint.Extension)" />
+            <UpToDateCheckBuilt Include="@(_ESEntryPoint)" Original="%(_ESEntryPoint.Src)" />
+        </ItemGroup>
+
+        <ItemGroup Condition="'$(_ESExitCode)' == '0' or '$(_ESExitCode)' == ''">
+            <Content Include="@(_ESEntryPoint)" Link="$(ESBuildWebRoot)%(_ESEntryPoint.Src)" />
+            <FileWrites Include="@(_ESEntryPoint)" />
         </ItemGroup>
     </Target>
 
-    <Target Name="_ESBuildResetContentRoot" DependsOnTargets="_ESBuildPrepareForRun;ResolveProjectStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsManifest">
+    <!-- Content in wwwroot becomes an SWA, but the physical files aren't there - to run locally, we need to redefine their location -->
+    <Target Name="_ESBuildResetContentRoot" DependsOnTargets="_ESBuildDefineProps;ResolveProjectStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsManifest">
         <ItemGroup>
-            <StaticWebAsset Condition="$([System.String]::new('%(StaticWebAsset.OriginalItemSpec)').StartsWith($(_ESBuildBundlePath)))">
-                <ContentRoot>$(_ESBuildBundlePath)</ContentRoot>
+            <StaticWebAsset Condition="$([System.String]::new('%(StaticWebAsset.OriginalItemSpec)').StartsWith($(_ESOutputPath)))">
+                <ContentRoot>$(_ESOutputPath)</ContentRoot>
             </StaticWebAsset>
         </ItemGroup>
     </Target>

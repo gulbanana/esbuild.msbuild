@@ -5,6 +5,7 @@
     "esbuild": "0.19.4"
   },
   "scripts": {
-    "build": "nuget pack -OutputDirectory ../dist"
+    "build": "nuget pack -OutputDirectory ../dist",
+    "test":"rm -r $HOME\\\\.nuget\\\\packages\\\\esbuild.msbuild; dotnet build ../test/*.csproj"
   }
 }

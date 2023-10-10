@@ -5,6 +5,7 @@
     <Target Name="_ESBuildDefineProps">
         <PropertyGroup>
             <_ESBundlePath>$(IntermediateOutputPath)esbundle\</_ESBundlePath>
+            <_ESBundlePathNormalized>$([MSBuild]::NormalizePath($(_ESBundlePath)))</_ESBundlePathNormalized>
             <_ESOutputPath>$(IntermediateOutputPath)esbuild\</_ESOutputPath>
             <_ESOutputPath Condition="'$(ESBuildIntermediatePath)' != ''">$(ESBuildIntermediatePath)</_ESOutputPath>
         </PropertyGroup>
@@ -103,11 +104,19 @@
     </Target>
 
     <!-- Content in wwwroot becomes an SWA, but the physical files aren't there - to run locally, we need to redefine their location -->
+    <!-- Furthermore, the prebundled assets have been given the wrong relative path, which must be reset relative to esbundle/ -->
     <Target Name="_ESBuildResetContentRoot" DependsOnTargets="_ESBuildDefineProps;ResolveProjectStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsManifest">
         <ItemGroup>
             <StaticWebAsset Condition="$([System.String]::new('%(StaticWebAsset.OriginalItemSpec)').StartsWith($(_ESOutputPath)))">
                 <ContentRoot>$(_ESOutputPath)</ContentRoot>
+            </StaticWebAsset> 
+            <Foo Include="@(StaticWebAsset)" Condition="$([MSBuild]::NormalizePath($([System.String]::new('%(StaticWebAsset.RelativePath)'))).StartsWith($(_ESBundlePathNormalized)))">
+                <RelativePath>$([System.String]::new('%(StaticWebAsset.RelativePath)').Substring($(_ESBundlePath.Length)))</RelativePath>
+            </Foo>    
+            <StaticWebAsset Include="@(StaticWebAsset)" Condition="$([MSBuild]::NormalizePath($([System.String]::new('%(StaticWebAsset.RelativePath)'))).StartsWith($(_ESBundlePathNormalized)))">
+                <RelativePath>$([System.String]::new('%(StaticWebAsset.RelativePath)').Substring($(_ESBundlePath.Length)))</RelativePath>
             </StaticWebAsset>
+            <StaticWebAsset Remove="@(StaticWebAsset)" Condition="$([MSBuild]::NormalizePath($([System.String]::new('%(StaticWebAsset.RelativePath)'))).StartsWith($(_ESBundlePathNormalized)))" />
         </ItemGroup>
     </Target>
 </Project>

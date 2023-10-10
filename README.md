@@ -37,11 +37,12 @@ Bundling can be configured with properties or item metadata
 
 | Global property    | Item metadata | Default                          | Description                                                                                          |
 | ------------------ | ------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| n/a                | `Group`       | None.                            | ESBuild items with the same Group will be concatenated together before bundling.                     |
 | `ESBuildArguments` | `Arguments`   | None.                            | Overrides all other config. See [https://esbuild.github.io/api/](https://esbuild.github.io/api/).    |
 | `ESBuildBundle`    | `Bundle`      | `True`                           | Inline any imported dependencies into the output file.                                               |
+| `ESBuildExternals` | `Externals`   | None                             | Semicolon-separated list of external packages that don't require resolution.                         |
 | `ESBuildMinify`    | `Minify`      | `True` in Release configuration. | Rewrite syntax to be more compact. Takes advantage of all features allowed by Targets.               |
 | `ESBuildTargets`   | `Targets`     | `esnext`                         | Semicolon-separated list of required support levels. (Unlike `--targets`, which is comma-separated). |
-| n/a                | `Group`       | None.                            | ESBuild items with the same Group will be concatenated together before bundling.                     |
 
 Platforms
 ---------

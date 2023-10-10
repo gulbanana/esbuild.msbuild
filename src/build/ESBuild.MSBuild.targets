@@ -49,19 +49,24 @@
                 <Minify Condition="'%(ESBuild.Minify)' == 'True'"> --minify</Minify>
                 <Minify Condition="'%(ESBuild.Minify)' == '' and '$(ESBuildMinify)' == 'True'"> --minify</Minify>
 
-                <Targets Condition="'%(ESBuild.Targets)' != ''"> --target=$([System.String]::new("%(ESBuild.Targets)").Replace(";",","))</Targets>
-                <Targets Condition="'%(ESBuild.Targets)' == '' and '$(ESBuildTargets)' != ''"> --target=$([System.String]::new("$(ESBuildTargets)").Replace(";",","))</Targets>
+                <Targets Condition="'%(ESBuild.Targets)' != ''"> --target=$([System.String]::new("%(ESBuild.Targets)").Replace(";", ","))</Targets>
+                <Targets Condition="'%(ESBuild.Targets)' == '' and '$(ESBuildTargets)' != ''"> --target=$([System.String]::new("$(ESBuildTargets)").Replace(";", ","))</Targets>
+
+                <Externals Condition="'%(ESBuild.Externals)' != ''"> --external:$([System.String]::new("%(ESBuild.Externals)").Replace(";", " --external:"))</Externals>
+                <Externals Condition="'%(ESBuild.Externals)' == '' and '$(ESBuildExternals)' != ''"> --external:$([System.String]::new("$(ESBuildExternals)").Replace(";", " --external:"))</Externals>
 
                 <Arguments>$(ESBuildArguments)</Arguments>
                 <Arguments Condition="'%(ESBuild.Arguments)' != ''">%(ESBuild.Arguments)</Arguments>
             </_ESEntryPoint>
         </ItemGroup>
 
-        <Exec Condition="'%(_ESEntryPoint.Arguments)' != ''" Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning %(_ESEntryPoint.Arguments)'>
+        <Exec Condition="'%(_ESEntryPoint.Arguments)' != ''" 
+              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning %(_ESEntryPoint.Arguments)'>
             <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />
         </Exec>
 
-        <Exec Condition="'%(_ESEntryPoint.Arguments)' == ''" Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)'>
+        <Exec Condition="'%(_ESEntryPoint.Arguments)' == ''" 
+              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)'>
             <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />
         </Exec>
 

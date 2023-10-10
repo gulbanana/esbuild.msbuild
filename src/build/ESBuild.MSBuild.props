@@ -10,10 +10,11 @@
         <ESBuildBinaryPath>$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildBinaryPath>
         <ESBuildIntermediatePath></ESBuildIntermediatePath>
         <ESBuildWebRoot>wwwroot\</ESBuildWebRoot>        
+        <ESBuildArguments></ESBuildArguments>
         <ESBuildBundle>True</ESBuildBundle>
+        <ESBuildExternals></ESBuildExternals>
         <ESBuildMinify>False</ESBuildMinify>
         <ESBuildMinify Condition="'$(Configuration)' == 'Release'">True</ESBuildMinify>
-        <ESBuildTargets>esnext</ESBuildTargets>
-        <ESBuildArguments></ESBuildArguments>
+        <ESBuildTargets>esnext</ESBuildTargets>                
     </PropertyGroup>
 </Project>

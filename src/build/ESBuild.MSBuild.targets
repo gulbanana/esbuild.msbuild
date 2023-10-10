@@ -34,45 +34,52 @@
         <_ESConcat Sources="@(_ESBundle)" BundlePath="$(_ESBundlePath)" />
     </Target>
 
-    <!-- Resolve each entry point's config, run esbuild and notify about it -->
-    <Target Name="_ESBuildTransform" DependsOnTargets="_ESBuildPartitionGroups;_ESBuildConcatGroups" Inputs="@(ESBuild)" Outputs="@(ESBuild -> '$(_ESOutputPath)%(Filename)%(Extension)')">
+    <!-- Assign each bundle item a destination, which depends on whether it was preconcatenated -->
+    <Target Name="_ESBuildResolve" DependsOnTargets="_ESBuildPartitionGroups;_ESBuildConcatGroups">
+        <_ESResolve EntryPoints="@(ESBuild)" ExtensionMap="@(ESBuildMapExtension)" OutputPath="$(_ESOutputPath)">
+            <Output TaskParameter="ResolvedEntryPoints" ItemName="_ESBuildResolved" />
+        </_ESResolve>
+    </Target>
+
+    <!-- Calculate each entry point's config, run esbuild and notify about it -->
+    <Target Name="_ESBuildTransform" DependsOnTargets="_ESBuildResolve" Inputs="@(_ESBuildResolved)" Outputs="@(_ESBuildResolved -> '%(Dest)')">
         <ItemGroup>
-            <_ESEntryPoint Include="$(_ESOutputPath)%(ESBuild.Filename)%(ESBuild.Extension)">
-                <Src>%(ESBuild.Identity)</Src>
+            <_ESEntryPoint Include="%(_ESBuildResolved.Dest)">
+                <Src>%(_ESBuildResolved.Identity)</Src>
 
-                <Spec>%(ESBuild.Identity)</Spec>
-                <Spec Condition="'%(ESBuild.Spec)' != ''">%(ESBuild.Spec)</Spec>
+                <Spec>%(_ESBuildResolved.Identity)</Spec>
+                <Spec Condition="'%(_ESBuildResolved.Spec)' != ''">%(_ESBuildResolved.Spec)</Spec>
 
-                <Bundle Condition="'%(ESBuild.Bundle)' == 'True'"> --bundle</Bundle>
-                <Bundle Condition="'%(ESBuild.Bundle)' == '' and '$(ESBuildBundle)' == 'True'"> --bundle</Bundle>
+                <Bundle Condition="'%(_ESBuildResolved.Bundle)' == 'True'"> --bundle</Bundle>
+                <Bundle Condition="'%(_ESBuildResolved.Bundle)' == '' and '$(ESBuildBundle)' == 'True'"> --bundle</Bundle>
                 
-                <Minify Condition="'%(ESBuild.Minify)' == 'True'"> --minify</Minify>
-                <Minify Condition="'%(ESBuild.Minify)' == '' and '$(ESBuildMinify)' == 'True'"> --minify</Minify>
+                <Minify Condition="'%(_ESBuildResolved.Minify)' == 'True'"> --minify</Minify>
+                <Minify Condition="'%(_ESBuildResolved.Minify)' == '' and '$(ESBuildMinify)' == 'True'"> --minify</Minify>
 
-                <Targets Condition="'%(ESBuild.Targets)' != ''"> --target=$([System.String]::new("%(ESBuild.Targets)").Replace(";", ","))</Targets>
-                <Targets Condition="'%(ESBuild.Targets)' == '' and '$(ESBuildTargets)' != ''"> --target=$([System.String]::new("$(ESBuildTargets)").Replace(";", ","))</Targets>
+                <Targets Condition="'%(_ESBuildResolved.Targets)' != ''"> --target=$([System.String]::new("%(_ESBuildResolved.Targets)").Replace(";", ","))</Targets>
+                <Targets Condition="'%(_ESBuildResolved.Targets)' == '' and '$(ESBuildTargets)' != ''"> --target=$([System.String]::new("$(ESBuildTargets)").Replace(";", ","))</Targets>
 
-                <Externals Condition="'%(ESBuild.Externals)' != ''"> --external:$([System.String]::new("%(ESBuild.Externals)").Replace(";", " --external:"))</Externals>
-                <Externals Condition="'%(ESBuild.Externals)' == '' and '$(ESBuildExternals)' != ''"> --external:$([System.String]::new("$(ESBuildExternals)").Replace(";", " --external:"))</Externals>
+                <Externals Condition="'%(_ESBuildResolved.Externals)' != ''"> --external:$([System.String]::new("%(_ESBuildResolved.Externals)").Replace(";", " --external:"))</Externals>
+                <Externals Condition="'%(_ESBuildResolved.Externals)' == '' and '$(ESBuildExternals)' != ''"> --external:$([System.String]::new("$(ESBuildExternals)").Replace(";", " --external:"))</Externals>
 
                 <Arguments>$(ESBuildArguments)</Arguments>
-                <Arguments Condition="'%(ESBuild.Arguments)' != ''">%(ESBuild.Arguments)</Arguments>
+                <Arguments Condition="'%(_ESBuildResolved.Arguments)' != ''">%(ESBuild.Arguments)</Arguments>
             </_ESEntryPoint>
         </ItemGroup>
 
         <Message Condition="'$(ESBuildEcho)' != 'False' and '%(_ESEntryPoint.Arguments)' != ''" Importance="high" 
-                 Text='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning %(_ESEntryPoint.Arguments)' />
+                 Text='esbuild %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir) %(_ESEntryPoint.Arguments)' />
 
         <Message Condition="'$(ESBuildEcho)' != 'False' and '%(_ESEntryPoint.Arguments)' == ''" Importance="high" 
-                 Text='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)' />
+                 Text='esbuild %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir)%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)' />
 
         <Exec Condition="'%(_ESEntryPoint.Arguments)' != ''" 
-              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning %(_ESEntryPoint.Arguments)'>
+              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir) %(_ESEntryPoint.Arguments)'>
             <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />
         </Exec>
 
         <Exec Condition="'%(_ESEntryPoint.Arguments)' == ''" 
-              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)'>
+              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir)%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)'>
             <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />
         </Exec>
 

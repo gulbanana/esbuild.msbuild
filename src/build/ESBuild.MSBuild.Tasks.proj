@@ -18,6 +18,7 @@
           representativeItem.CopyMetadataTo(destinationItem);
           destinationItem.RemoveMetadata("Group");
           destinationItem.SetMetadata("Spec", string.Join(";", sourceGroup.Select(s => s.ItemSpec)));
+          destinationItem.SetMetadata("EffectiveDir", destinationItem.GetMetadata("RelativeDir").Substring(BundlePath.Length));
           destinations.Add(destinationItem);
         }
         
@@ -49,6 +50,56 @@
         File.WriteAllText(destination, concatenated.ToString());
       ]]>
       </Code>
+    </Task>
+  </UsingTask>
+
+  <!-- Modifies items to add a Dest metadata, our best guess at what the bundling process will produce -->
+  <UsingTask TaskName="_ESResolve" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>      
+      <EntryPoints ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />      
+      <OutputPath ParameterType="System.String" Required="true" />
+      <ExtensionMap ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />      
+      <ResolvedEntryPoints ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+          var augmented = new List<ITaskItem>();
+
+          foreach (var entryItem in EntryPoints)
+          {            
+            var ext = entryItem.GetMetadata("Extension");
+            foreach (var extensionItem in ExtensionMap)
+            {
+              if (ext.Equals(extensionItem.ItemSpec))
+              {
+                ext = extensionItem.GetMetadata("To");
+                break;
+              }
+            }
+
+            var destination = new StringBuilder();
+            destination.Append(OutputPath);
+            if (string.IsNullOrEmpty(entryItem.GetMetadata("Spec")))
+            {
+              destination.Append(entryItem.GetMetadata("RelativeDir"));
+            }
+            else
+            {
+              destination.Append(entryItem.GetMetadata("EffectiveDir"));
+            }
+            destination.Append(entryItem.GetMetadata("Filename"));
+            destination.Append(ext);
+
+            var augmentedItem = new TaskItem(entryItem.ItemSpec);
+            entryItem.CopyMetadataTo(augmentedItem);
+            augmentedItem.SetMetadata("Dest", destination.ToString());
+            augmented.Add(augmentedItem);
+          }
+          
+          ResolvedEntryPoints = augmented.ToArray();
+          ]]>
+        </Code>
     </Task>
   </UsingTask>
 </Project>

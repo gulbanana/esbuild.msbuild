@@ -18,4 +18,8 @@
         <ESBuildMinify Condition="'$(Configuration)' == 'Release'">True</ESBuildMinify>
         <ESBuildTargets>esnext</ESBuildTargets>                
     </PropertyGroup>
+
+    <ItemGroup>
+        <ESBuildMapExtension Include=".tsx;.ts;.jsx;.json;.txt" To=".js" />
+    </ItemGroup>
 </Project>

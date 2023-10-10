@@ -7,9 +7,10 @@
         <_ESBuildArch Condition="$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) == Arm64">arm64</_ESBuildArch>
         <_ESBuildBinary>esbuild</_ESBuildBinary>
         <_ESBuildBinary Condition="'$(OS)' == 'Windows_NT'">esbuild.exe</_ESBuildBinary>
-        <ESBuildBinaryPath>$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildBinaryPath>
         <ESBuildIntermediatePath></ESBuildIntermediatePath>
-        <ESBuildWebRoot>wwwroot\</ESBuildWebRoot>        
+        <ESBuildBinaryPath Condition="'$(ESBuildBinaryPath)' == ''">$(MSBuildThisFileDirectory)..\tools\$(_ESBuildOS)-$(_ESBuildArch)\$(_ESBuildBinary)</ESBuildBinaryPath>                
+        <ESBuildWebRoot Condition="'$(ESBuildWebRoot)' == ''">wwwroot\</ESBuildWebRoot>        
+        <ESBuildEcho Condition="'$(ESBuildEcho)' == ''">False</ESBuildEcho>
         <ESBuildArguments></ESBuildArguments>
         <ESBuildBundle>True</ESBuildBundle>
         <ESBuildExternals></ESBuildExternals>

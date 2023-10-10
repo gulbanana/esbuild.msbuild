@@ -29,7 +29,8 @@ For more complex scenarios, these MSBuild properties are available.
 
 | Property                  | Default                         | Description                              | Purpose                                                                                           |
 | ------------------------- | ------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `ESBuildBinaryPath`       | Platform-specific.              | Location of `esbuild` or `esbuild.exe`.  | For low-level integration - use it to run esbuild yourself, or change it to run a custom version. |                                        |
+| `ESBuildBinaryPath`       | Platform-specific.              | Location of `esbuild` or `esbuild.exe`.  | For low-level integration - use it to run esbuild yourself, or change it to run a custom version. |
+| `ESBuildEcho`             | `False`                         | Whether to log esbuild invocations.      | Set to true to display generated commandlines.                                                    |
 | `ESBuildIntermediatePath` | `obj/$(Configuration)/esbuild/` | Location to write generated bundles.     | Can be changed if you want to store the bundles or distribute them out-of-band.                   |
 | `ESBuildWebRoot`          | `wwwroot/`                      | Virtual path of generated Content items. | Provides static web assets integration and the output path used for `dotnet publish`.             |
 

@@ -60,6 +60,12 @@
             </_ESEntryPoint>
         </ItemGroup>
 
+        <Message Condition="'$(ESBuildEcho)' != 'False' and '%(_ESEntryPoint.Arguments)' != ''" Importance="high" 
+                 Text='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning %(_ESEntryPoint.Arguments)' />
+
+        <Message Condition="'$(ESBuildEcho)' != 'False' and '%(_ESEntryPoint.Arguments)' == ''" Importance="high" 
+                 Text='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)' />
+
         <Exec Condition="'%(_ESEntryPoint.Arguments)' != ''" 
               Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --outfile=%(_ESEntryPoint.Identity) --log-level=warning %(_ESEntryPoint.Arguments)'>
             <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />

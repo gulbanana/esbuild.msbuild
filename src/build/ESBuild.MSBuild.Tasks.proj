@@ -1,34 +1,29 @@
 <Project>
-  <!-- Calculates the entrypoint for each set of ESBuild items with the same Group -->
+  <!-- Calculates the entrypoint for a set of ESBuild items with the same Group -->
   <UsingTask TaskName="_ESConcatPrep" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
       <Sources ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Group ParameterType="System.String" Required="true" />
       <BundlePath ParameterType="System.String" Required="true" />
-      <Destinations ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+      <EntryPoint ParameterType="Microsoft.Build.Framework.ITaskItem" Output="true" />
     </ParameterGroup>
     <Task>
       <Code Type="Fragment" Language="cs">
       <![CDATA[
-        var destinations = new List<ITaskItem>();
-
-        foreach (var sourceGroup in Sources.GroupBy(s => s.GetMetadata("Group")))
-        {
-          var representativeItem = sourceGroup.First();
-          var destinationItem = new TaskItem(Path.Combine(BundlePath, sourceGroup.Key));
-          representativeItem.CopyMetadataTo(destinationItem);
-          destinationItem.RemoveMetadata("Group");
-          destinationItem.SetMetadata("Spec", string.Join(";", sourceGroup.Select(s => s.ItemSpec)));
-          destinationItem.SetMetadata("EffectiveDir", destinationItem.GetMetadata("RelativeDir").Substring(BundlePath.Length));
-          destinations.Add(destinationItem);
-        }
+        var representativeItem = Sources.First();
+        var destinationItem = new TaskItem(Path.Combine(BundlePath, Group));
+        representativeItem.CopyMetadataTo(destinationItem);
+        destinationItem.RemoveMetadata("Group");
+        destinationItem.SetMetadata("Spec", string.Join(";", Sources.Select(s => s.ItemSpec)));
+        destinationItem.SetMetadata("EffectiveDir", destinationItem.GetMetadata("RelativeDir").Substring(BundlePath.Length));
         
-        Destinations = destinations.ToArray();
+        EntryPoint = destinationItem;
       ]]>
       </Code>
     </Task>
   </UsingTask>
 
-  <!-- Concatenates a single set of items with the same Group - batched by target rather than task -->
+  <!-- Concatenates a set of ESBuild items with the same Group -->
   <UsingTask TaskName="_ESConcat" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
       <Sources ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />

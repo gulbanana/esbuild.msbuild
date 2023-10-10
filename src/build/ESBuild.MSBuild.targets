@@ -18,10 +18,10 @@
         </ItemGroup>
     </Target>
 
-    <!-- Define entrypoints from each group of items - batches internally inside the task so that we always get output items -->
+    <!-- Define an entrypoint for each group of items -->
     <Target Name="_ESBuildPartitionGroups" DependsOnTargets="_ESBuildDefineProps;_ESBuildExtractGroups">
-        <_ESConcatPrep Sources="@(_ESBundle)" BundlePath="$(_ESBundlePath)">
-            <Output TaskParameter="Destinations" ItemName="_ESBundleEntryPoint" />
+        <_ESConcatPrep Sources="@(_ESBundle)" BundlePath="$(_ESBundlePath)" Group="%(_ESBundle.Group)">
+            <Output TaskParameter="EntryPoint" ItemName="_ESBundleEntryPoint" />
         </_ESConcatPrep>
 
         <ItemGroup>

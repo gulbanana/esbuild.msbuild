@@ -1,5 +1,5 @@
 import { x } from './included';
 
 window.main = function() {
-    document.write('Hello, ' + x + '!');
+    document.write('<p>Hello, ' + x + '!</p>');
 }

@@ -42,9 +42,11 @@ Bundling can be configured with properties or item metadata
 | `ESBuildArguments`   | `Arguments`   | None.                            | Overrides all other config. (See [esbuild docs](https://esbuild.github.io/api/).)                    |
 | `ESBuildBundle`      | `Bundle`      | `True`                           | Inline any imported dependencies into the output file.                                               |
 | `ESBuildExternals`   | `Externals`   | None                             | Semicolon-separated list of external packages that don't require resolution.                         |
+| `ESBuildFormat`      | `Format`      | [Automatic](https://esbuild.github.io/api/#format). | `iife`, `esm` or `cjs`.                                                           |
 | `ESBuildMinify`      | `Minify`      | `True` in Release configuration. | Rewrite syntax to be more compact. Takes advantage of all features allowed by Targets.               |
+| `ESBuildPlatform`    | `Platform`    | `browser`                        | `browser`, `node` or `neutral`.                                                                      |
 | `ESBuildTargets`     | `Targets`     | `esnext`                         | Semicolon-separated list of required support levels. (Unlike `--targets`, which is comma-separated). |
-| `ESBuildTreeShaking` | `TreeShaking` | [Automatic](https://esbuild.github.io/api/#format). | `True` to force-enable or `false` to force-disable dead code elimination.         |
+| `ESBuildTreeShaking` | `TreeShaking` | [Automatic](https://esbuild.github.io/api/#tree-shaking). | `True` to force-enable or `False` to force-disable dead code elimination.   |
 
 
 Platforms

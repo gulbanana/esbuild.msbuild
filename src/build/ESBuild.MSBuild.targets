@@ -105,7 +105,7 @@
 
     <!-- Content in wwwroot becomes an SWA, but the physical files aren't there - to run locally, we need to redefine their location -->
     <!-- Furthermore, the prebundled assets have been given the wrong relative path, which must be reset relative to esbundle/ -->
-    <Target Name="_ESBuildResetContentRoot" DependsOnTargets="_ESBuildDefineProps;ResolveProjectStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsManifest">
+    <Target Name="_ESBuildResetContentRoot" DependsOnTargets="_ESBuildDefineProps;ResolveProjectStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsPackFiles;GenerateStaticWebAssetsManifest">
         <ItemGroup>
             <StaticWebAsset Condition="$([System.String]::new('%(StaticWebAsset.OriginalItemSpec)').StartsWith($(_ESOutputPath)))">
                 <ContentRoot>$(_ESOutputPath)</ContentRoot>

@@ -51,20 +51,25 @@
                 <Spec>%(_ESBuildResolved.Identity)</Spec>
                 <Spec Condition="'%(_ESBuildResolved.Spec)' != ''">%(_ESBuildResolved.Spec)</Spec>
 
+                <Arguments>$(ESBuildArguments)</Arguments>
+                <Arguments Condition="'%(_ESBuildResolved.Arguments)' != ''">%(ESBuild.Arguments)</Arguments>
+
                 <Bundle Condition="'%(_ESBuildResolved.Bundle)' == 'True'"> --bundle</Bundle>
                 <Bundle Condition="'%(_ESBuildResolved.Bundle)' == '' and '$(ESBuildBundle)' == 'True'"> --bundle</Bundle>
                 
+                <Externals Condition="'%(_ESBuildResolved.Externals)' != ''"> --external:$([System.String]::new("%(_ESBuildResolved.Externals)").Replace(";", " --external:"))</Externals>
+                <Externals Condition="'%(_ESBuildResolved.Externals)' == '' and '$(ESBuildExternals)' != ''"> --external:$([System.String]::new("$(ESBuildExternals)").Replace(";", " --external:"))</Externals>
+
                 <Minify Condition="'%(_ESBuildResolved.Minify)' == 'True'"> --minify</Minify>
                 <Minify Condition="'%(_ESBuildResolved.Minify)' == '' and '$(ESBuildMinify)' == 'True'"> --minify</Minify>
 
                 <Targets Condition="'%(_ESBuildResolved.Targets)' != ''"> --target=$([System.String]::new("%(_ESBuildResolved.Targets)").Replace(";", ","))</Targets>
                 <Targets Condition="'%(_ESBuildResolved.Targets)' == '' and '$(ESBuildTargets)' != ''"> --target=$([System.String]::new("$(ESBuildTargets)").Replace(";", ","))</Targets>
 
-                <Externals Condition="'%(_ESBuildResolved.Externals)' != ''"> --external:$([System.String]::new("%(_ESBuildResolved.Externals)").Replace(";", " --external:"))</Externals>
-                <Externals Condition="'%(_ESBuildResolved.Externals)' == '' and '$(ESBuildExternals)' != ''"> --external:$([System.String]::new("$(ESBuildExternals)").Replace(";", " --external:"))</Externals>
-
-                <Arguments>$(ESBuildArguments)</Arguments>
-                <Arguments Condition="'%(_ESBuildResolved.Arguments)' != ''">%(ESBuild.Arguments)</Arguments>
+                <TreeShaking Condition="'%(_ESBuildResolved.TreeShaking)' == 'True'"> --tree-shaking=true</TreeShaking>
+                <TreeShaking Condition="'%(_ESBuildResolved.TreeShaking)' == 'False'"> --tree-shaking=false</TreeShaking>
+                <TreeShaking Condition="'%(_ESBuildResolved.TreeShaking)' == '' and '$(ESBuildTreeShaking)' == 'True'"> --tree-shaking=true</TreeShaking>                
+                <TreeShaking Condition="'%(_ESBuildResolved.TreeShaking)' == '' and '$(ESBuildTreeShaking)' == 'False'"> --tree-shaking=false</TreeShaking>
             </_ESEntryPoint>
         </ItemGroup>
 
@@ -72,7 +77,7 @@
                  Text='esbuild %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir) %(_ESEntryPoint.Arguments)' />
 
         <Message Condition="'$(ESBuildEcho)' != 'False' and '%(_ESEntryPoint.Arguments)' == ''" Importance="high" 
-                 Text='esbuild %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir)%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)' />
+                 Text='esbuild %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir)%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.TreeShaking)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)' />
 
         <Exec Condition="'%(_ESEntryPoint.Arguments)' != ''" 
               Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir) %(_ESEntryPoint.Arguments)'>
@@ -80,7 +85,7 @@
         </Exec>
 
         <Exec Condition="'%(_ESEntryPoint.Arguments)' == ''" 
-              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir)%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)'>
+              Command='"$(ESBuildBinaryPath)" %(_ESEntryPoint.Src) --log-level=warning --outdir=%(_ESEntryPoint.RelativeDir)%(_ESEntryPoint.Bundle)%(_ESEntryPoint.Minify)%(_ESEntryPoint.TreeShaking)%(_ESEntryPoint.Targets)%(_ESEntryPoint.Externals)'>
             <Output TaskParameter="ExitCode" PropertyName="_ESExitCode" />
         </Exec>
 

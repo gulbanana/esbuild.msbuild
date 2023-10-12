@@ -16,7 +16,7 @@
         <ESBuildExternals></ESBuildExternals>
         <ESBuildMinify>False</ESBuildMinify>
         <ESBuildMinify Condition="'$(Configuration)' == 'Release'">True</ESBuildMinify>
-        <ESBuildTargets>esnext</ESBuildTargets>                
+        <ESBuildTargets>esnext</ESBuildTargets>
     </PropertyGroup>
 
     <ItemGroup>

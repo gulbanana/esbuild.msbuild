@@ -15,7 +15,7 @@ Add a package reference and `ESBuild` items to your csproj. Each entry point wil
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="ESBuild.MSBuild" Version="0.19.4.*" />
+        <PackageReference Include="ESBuild.MSBuild" Version="0.19.5.*" />
         <ESBuild Include="index.ts" Minify="true" />
         <ESBuild Include="app.css" />
         <ESBuild Include="global/*.css" Group="global.css" />

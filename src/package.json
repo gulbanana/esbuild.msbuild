@@ -2,10 +2,10 @@
   "license": "MIT",
   "packageManager": "yarn@3.6.4",
   "dependencies": {
-    "esbuild": "0.19.4"
+    "esbuild": "0.19.5"
   },
   "scripts": {
     "build": "nuget pack -OutputDirectory ../dist",
-    "test":"rm -r $HOME\\\\.nuget\\\\packages\\\\esbuild.msbuild; dotnet build ../test/*.csproj"
+    "test": "rm -r $HOME\\\\.nuget\\\\packages\\\\esbuild.msbuild; dotnet build ../test/*.csproj"
   }
 }

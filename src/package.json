@@ -2,7 +2,7 @@
   "license": "MIT",
   "packageManager": "yarn@3.6.4",
   "dependencies": {
-    "esbuild": "0.19.5"
+    "esbuild": "0.25.4"
   },
   "scripts": {
     "build": "nuget pack -OutputDirectory ../dist",

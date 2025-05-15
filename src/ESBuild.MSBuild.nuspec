@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ESBuild.MSBuild</id>
-    <version>0.19.5</version>
+    <version>0.25.4</version>
     <description>esbuild for MSBuild</description>
     <authors>Thomas Castiglione</authors>
     <copyright>Thomas Castiglione</copyright>

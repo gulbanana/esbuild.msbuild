@@ -11,7 +11,7 @@ Add a package reference and `ESBuild` items to your csproj. Each entry point wil
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
     </PropertyGroup>
     
     <ItemGroup>

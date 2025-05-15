@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ESBuild.MSBuild" Version="0.19.4" />
+		<PackageReference Include="ESBuild.MSBuild" Version="0.19.5" />
 		<ESBuild Include="index.js" Targets="es2020" />
 		<ESBuild Include="groups\style1.css;groups\style2.css" Group="group12.css" />
 		<ESBuild Include="groups\subdir\*.css" Group="group34.css" Minify="true" />

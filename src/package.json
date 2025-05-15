@@ -6,6 +6,6 @@
   },
   "scripts": {
     "build": "nuget pack -OutputDirectory ../dist",
-    "test": "rm -r $HOME\\\\.nuget\\\\packages\\\\esbuild.msbuild; dotnet build ../test/*.csproj"
+    "test": "rm -r $HOME\\\\.nuget\\\\packages\\\\esbuild.msbuild; dotnet publish ../test/*.csproj"
   }
 }

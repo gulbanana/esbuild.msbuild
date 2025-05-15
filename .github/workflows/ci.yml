@@ -31,7 +31,7 @@ jobs:
         with:
             nuget-version: '6.x'
 
-      - run: nuget pack -Version 0.19.5.${{github.run_number}} -OutputDirectory ../dist
+      - run: nuget pack -Version 0.25.4.${{github.run_number}} -OutputDirectory ../dist
 
       - uses: actions/upload-artifact@v3
         with:

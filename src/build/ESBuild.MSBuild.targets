@@ -109,7 +109,11 @@
         </ItemGroup>
 
         <ItemGroup Condition="'$(_ESExitCode)' == '0' or '$(_ESExitCode)' == ''">
-            <Content Include="@(_ESEntryPoint)" Link="$(ESBuildWebRoot)%(_ESEntryPoint.Src)" />
+            <!-- Register as Content for backward compatibility, but without Link for .NET 9+ -->
+            <Content Include="@(_ESEntryPoint)">
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+                <TargetPath>$(ESBuildWebRoot)%(_ESEntryPoint.Filename)%(_ESEntryPoint.Extension)</TargetPath>
+            </Content>
             <FileWrites Include="@(_ESEntryPoint)" />
         </ItemGroup>
     </Target>
@@ -118,16 +122,29 @@
     <!-- Furthermore, the prebundled assets have been given the wrong relative path, which must be reset relative to esbundle/ -->
     <Target Name="_ESBuildResetContentRoot" DependsOnTargets="_ESBuildDefineProps;ResolveProjectStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsPackFiles;GenerateStaticWebAssetsManifest">
         <ItemGroup>
-            <StaticWebAsset Condition="$([System.String]::new('%(StaticWebAsset.OriginalItemSpec)').StartsWith($(_ESOutputPath)))">
+            <!-- Collect ESBuild outputs that need ContentRoot fixed -->
+            <_ESBuildAssetToFix Include="@(StaticWebAsset)" Condition="$([System.String]::new('%(StaticWebAsset.OriginalItemSpec)').StartsWith($(_ESOutputPath)))" />
+            
+            <!-- Collect bundled items that need RelativePath fixed -->
+            <_ESBuildBundledAsset Include="@(StaticWebAsset)" Condition="$([MSBuild]::NormalizePath($([System.String]::new('%(StaticWebAsset.RelativePath)'))).StartsWith($(_ESBundlePathNormalized)))" />
+        </ItemGroup>
+        
+        <ItemGroup>
+            <!-- Remove original assets that need fixing -->
+            <StaticWebAsset Remove="@(_ESBuildAssetToFix)" />
+            <StaticWebAsset Remove="@(_ESBuildBundledAsset)" />
+            
+            <!-- Re-add with fixed ContentRoot -->
+            <StaticWebAsset Include="@(_ESBuildAssetToFix)">
                 <ContentRoot>$(_ESOutputPath)</ContentRoot>
-            </StaticWebAsset> 
-            <Foo Include="@(StaticWebAsset)" Condition="$([MSBuild]::NormalizePath($([System.String]::new('%(StaticWebAsset.RelativePath)'))).StartsWith($(_ESBundlePathNormalized)))">
-                <RelativePath>$([System.String]::new('%(StaticWebAsset.RelativePath)').Substring($(_ESBundlePath.Length)))</RelativePath>
-            </Foo>    
-            <StaticWebAsset Include="@(StaticWebAsset)" Condition="$([MSBuild]::NormalizePath($([System.String]::new('%(StaticWebAsset.RelativePath)'))).StartsWith($(_ESBundlePathNormalized)))">
-                <RelativePath>$([System.String]::new('%(StaticWebAsset.RelativePath)').Substring($(_ESBundlePath.Length)))</RelativePath>
+                <AssetTraitName>Content</AssetTraitName>
+                <AssetTraitValue>$(PackageId)</AssetTraitValue>
             </StaticWebAsset>
-            <StaticWebAsset Remove="@(StaticWebAsset)" Condition="$([MSBuild]::NormalizePath($([System.String]::new('%(StaticWebAsset.RelativePath)'))).StartsWith($(_ESBundlePathNormalized)))" />
+            
+            <!-- Re-add bundled assets with fixed RelativePath -->
+            <StaticWebAsset Include="@(_ESBuildBundledAsset)">
+                <RelativePath>$([System.String]::new('%(_ESBuildBundledAsset.RelativePath)').Substring($(_ESBundlePath.Length)))</RelativePath>
+            </StaticWebAsset>
         </ItemGroup>
     </Target>
 </Project>

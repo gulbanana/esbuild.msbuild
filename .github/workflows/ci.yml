@@ -8,10 +8,10 @@ jobs:
       run:
         working-directory: src
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -19,7 +19,7 @@ jobs:
         run: corepack enable | corepack prepare yarn@3.6.4 --activate
 
       - name: workaround https://github.com/actions/setup-node/issues/531
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
           cache: yarn
@@ -27,13 +27,15 @@ jobs:
 
       - run: yarn install --immutable
 
-      - uses: nuget/setup-nuget@v1
+      - uses: actions/setup-dotnet@v5
         with:
-            nuget-version: '6.x'
+          dotnet-version: '10.0.x'
 
-      - run: nuget pack -Version 0.25.4.${{github.run_number}} -OutputDirectory ../dist
+      - run: dotnet pack --output ../dist ESBuild.MSBuild.nuspec
+        env: 
+          Version: 0.25.4.${{github.run_number}}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: package
           path: dist/*.nupkg
@@ -43,15 +45,14 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/release' 
     steps:
-        - uses: actions/download-artifact@v3
+        - uses: actions/download-artifact@v4
           with:
             name: package
             path: dist
 
-        - uses: nuget/setup-nuget@v1
+        - uses: actions/setup-dotnet@v5
           with:
-              nuget-version: '6.x'
-              nuget-api-key: ${{secrets.NUGET_API_KEY}}
-        
-        - run: nuget push dist/*.nupkg -Source https://api.nuget.org/v3/index.json
+            dotnet-version: '10.0.x'
+            
+        - run: dotnet nuget push dist/*.nupkg --source https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}}
 
